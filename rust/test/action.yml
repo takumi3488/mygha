@@ -2,10 +2,7 @@ name: 'Run Tests'
 description: 'Run Rust tests for the issue-picker project'
 runs:
   using: 'composite'
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-          
+  steps:  
     - name: Run cargo check
       shell: bash
       run: cargo check --all-features
