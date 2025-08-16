@@ -32,7 +32,7 @@ inputs:
       {
         "mcpServers": {
           "context7": {
-            "transport": "sse",
+            "type": "sse",
             "url": "https://mcp.context7.com/sse"
           }
         }
