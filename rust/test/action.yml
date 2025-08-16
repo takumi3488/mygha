@@ -2,7 +2,15 @@ name: 'Run Tests'
 description: 'Run Rust tests for the issue-picker project'
 runs:
   using: 'composite'
-  steps:  
+  steps:
+    - name: Install taplo
+      shell: bash
+      run: |
+        if ! command -v taplo &> /dev/null; then
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-linux-x86_64.gz \
+            | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
+        fi
+
     - name: Lint Cargo.toml
       shell: bash
       run: taplo lint Cargo.toml
