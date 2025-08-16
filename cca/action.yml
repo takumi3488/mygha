@@ -1,0 +1,112 @@
+name: 'Claude Code with S3 Backup'
+description: 'Run Claude Code Action and backup projects to S3 or S3-compatible storage (MinIO, etc.)'
+inputs:
+  claude-code-oauth-token:
+    description: 'Claude Code OAuth token'
+    required: true
+  mc-host-alias:
+    description: 'MinIO Client host alias name'
+    required: false
+    default: 's3'
+  mc-endpoint-url:
+    description: 'S3/MinIO endpoint URL'
+    required: true
+  mc-access-key:
+    description: 'S3/MinIO Access Key'
+    required: true
+  mc-secret-key:
+    description: 'S3/MinIO Secret Key'
+    required: true
+  s3-bucket:
+    description: 'S3 Bucket name'
+    required: true
+  additional-permissions:
+    description: 'Additional permissions for Claude Code'
+    required: false
+    default: |
+      actions: read
+  mcp_config:
+    description: 'MCP servers configuration for Claude Code'
+    required: false
+    default: |
+      {
+        "mcpServers": {
+          "context7": {
+            "transport": "sse",
+            "url": "https://mcp.context7.com/sse"
+          }
+        }
+      }
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Claude Code
+      id: claude
+      uses: anthropics/claude-code-action@beta
+      with:
+        claude_code_oauth_token: ${{ inputs.claude-code-oauth-token }}
+        additional_permissions: ${{ inputs.additional-permissions }}
+        model: "claude-opus-4-1-20250805"
+        mcp_config: ${{ inputs.mcp_config }}
+
+    - name: Install and configure MinIO Client
+      shell: bash
+      run: |
+        # Download and install MinIO Client
+        curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
+        chmod +x mc
+        sudo mv mc /usr/local/bin/
+        
+        # Configure MinIO Client
+        mc alias set ${{ inputs.mc-host-alias }} ${{ inputs.mc-endpoint-url }} ${{ inputs.mc-access-key }} ${{ inputs.mc-secret-key }}
+
+    - name: Compress and upload Claude projects to S3
+      shell: bash
+      run: |
+        CLAUDE_DIR="$HOME/.claude/projects"
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        RUN_ID="${{ github.run_id }}"
+        REPO_NAME="${{ github.repository }}"
+        SAFE_REPO_NAME=$(echo "$REPO_NAME" | tr '/' '_')
+        
+        # Create archive filename
+        ARCHIVE_NAME="claude_projects_${SAFE_REPO_NAME}_${RUN_ID}_${TIMESTAMP}.tar.gz"
+        TEMP_ARCHIVE="/tmp/${ARCHIVE_NAME}"
+        
+        # Check if Claude projects directory exists
+        if [ -d "$CLAUDE_DIR" ]; then
+          echo "📦 Compressing Claude projects directory..."
+          tar -czf "$TEMP_ARCHIVE" -C "$HOME/.claude" projects/
+          
+          # Calculate archive size
+          ARCHIVE_SIZE=$(du -h "$TEMP_ARCHIVE" | cut -f1)
+          echo "✅ Archive created: ${ARCHIVE_NAME} (${ARCHIVE_SIZE})"
+          
+          # Upload to S3 or S3-compatible storage using MinIO Client
+          MC_PATH="${{ inputs.mc-host-alias }}/${{ inputs.s3-bucket }}/${ARCHIVE_NAME}"
+          echo "☁️ Uploading to S3-compatible storage: ${MC_PATH}"
+          echo "🔗 Using endpoint: ${{ inputs.mc-endpoint-url }}"
+          
+          # Upload with metadata
+          mc cp "$TEMP_ARCHIVE" "$MC_PATH" \
+            --attr "github-repo=${REPO_NAME};github-run-id=${RUN_ID};github-actor=${{ github.actor }};github-event=${{ github.event_name }}"
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully uploaded to S3"
+            echo "📍 S3 Location: ${MC_PATH}"
+            
+            # Output S3 location for use in other steps
+            echo "s3-location=${MC_PATH}" >> $GITHUB_OUTPUT
+            echo "archive-name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
+            
+            # Clean up temporary file
+            rm -f "$TEMP_ARCHIVE"
+          else
+            echo "❌ Failed to upload to S3"
+            exit 1
+          fi
+        else
+          echo "⚠️ Claude projects directory not found at: $CLAUDE_DIR"
+          echo "Skipping upload..."
+        fi
