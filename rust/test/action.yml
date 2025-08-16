@@ -3,6 +3,18 @@ description: 'Run Rust tests for the issue-picker project'
 runs:
   using: 'composite'
   steps:  
+    - name: Lint Cargo.toml
+      shell: bash
+      run: taplo lint Cargo.toml
+
+    - name: Validate Cargo.toml
+      shell: bash
+      run: taplo check Cargo.toml
+
+    - name: Check Cargo.toml formatting
+      shell: bash
+      run: taplo fmt --check --option reorder_keys=true Cargo.toml
+
     - name: Run cargo check
       shell: bash
       run: cargo check --all-features
@@ -18,11 +30,3 @@ runs:
     - name: Check formatting
       shell: bash
       run: cargo fmt -- --check
-
-    - name: Check sort
-      shell: bash
-      run: cargo sort --check
-
-    - name: Run taplo
-      shell: bash
-      run: taplo check Cargo.toml
