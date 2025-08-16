@@ -1,0 +1,31 @@
+name: Test F# Project
+description: Run tests for the F# project
+
+inputs:
+  projectName:
+    description: 'Name of the project to test'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+      shell: bash
+    
+    - name: Build
+      run: dotnet build --no-restore
+      shell: bash
+    
+    - name: Check format
+      run: dotnet format ${{ inputs.projectName }}.sln --verify-no-changes --verbosity diagnostic
+      shell: bash
+    
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      shell: bash
