@@ -1,5 +1,12 @@
 name: 'Test'
 description: 'Test Julia project'
+
+inputs:
+  skipTest:
+    description: 'Skip test execution if set to true'
+    required: false
+    default: 'false'
+
 runs:
   using: 'composite'
   steps:
@@ -13,5 +20,6 @@ runs:
       run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
     
     - name: Run tests
+      if: inputs.skipTest != 'true'
       shell: bash
       run: julia --project=. -e 'using Pkg; Pkg.test()'

@@ -5,6 +5,10 @@ inputs:
   projectName:
     description: 'Name of the project to test'
     required: true
+  skipTest:
+    description: 'Skip test execution if set to true'
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -27,5 +31,6 @@ runs:
       shell: bash
     
     - name: Test
+      if: inputs.skipTest != 'true'
       run: dotnet test --no-build --verbosity normal
       shell: bash
