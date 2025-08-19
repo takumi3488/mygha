@@ -25,7 +25,7 @@ inputs:
     required: false
     default: |
       actions: read
-  mcp_config:
+  mcp-config:
     description: 'MCP servers configuration for Claude Code'
     required: false
     default: |
@@ -48,7 +48,7 @@ runs:
         claude_code_oauth_token: ${{ inputs.claude-code-oauth-token }}
         additional_permissions: ${{ inputs.additional-permissions }}
         model: "claude-opus-4-1-20250805"
-        mcp_config: ${{ inputs.mcp_config }}
+        mcp_config: ${{ inputs.mcp-config }}
 
     - name: Install and configure MinIO Client
       shell: bash

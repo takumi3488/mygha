@@ -2,7 +2,7 @@ name: Test
 description: Run tests for Bun project
 
 inputs:
-  skipTest:
+  skip-test:
     description: 'Skip test execution if set to true'
     required: false
     default: 'false'
@@ -20,7 +20,7 @@ runs:
       run: bun install
     
     - name: Run tests
-      if: inputs.skipTest != 'true'
+      if: inputs.skip-test != 'true'
       shell: bash
       run: bun test
     

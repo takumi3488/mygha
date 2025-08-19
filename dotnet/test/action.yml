@@ -2,10 +2,10 @@ name: Test F# Project
 description: Run tests for the F# project
 
 inputs:
-  projectName:
+  project-name:
     description: 'Name of the project to test'
     required: true
-  skipTest:
+  skip-test:
     description: 'Skip test execution if set to true'
     required: false
     default: 'false'
@@ -27,10 +27,10 @@ runs:
       shell: bash
     
     - name: Check format
-      run: dotnet format ${{ inputs.projectName }}.sln --verify-no-changes --verbosity diagnostic
+      run: dotnet format ${{ inputs.project-name }}.sln --verify-no-changes --verbosity diagnostic
       shell: bash
     
     - name: Test
-      if: inputs.skipTest != 'true'
+      if: inputs.skip-test != 'true'
       run: dotnet test --no-build --verbosity normal
       shell: bash
