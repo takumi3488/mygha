@@ -36,3 +36,4 @@ jobs:
           mc-access-key: ${{ secrets.MC_ACCESS_KEY }}
           mc-secret-key: ${{ secrets.MC_SECRET_KEY }}
           s3-bucket: ${{ secrets.S3_BUCKET }}
+          # model: 'claude-opus-4-1-20250805' # Optional: defaults to claude-opus-4-1-20250805
