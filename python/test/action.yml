@@ -1,0 +1,34 @@
+name: 'Test'
+description: 'Test Python project with uv and ruff'
+
+inputs:
+  skip-test:
+    description: 'Skip test execution if set to true'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+    
+    - name: Install dependencies
+      shell: bash
+      run: |
+        uv sync --locked --all-extras --dev
+    
+    - name: Run type checking with ty
+      shell: bash
+      run: uvx ty check
+
+    - name: Run ruff check
+      uses: astral-sh/ruff-action@v3
+
+    - name: Run ruff format check
+      run: ruff format --check
+    
+    - name: Run tests
+      if: inputs.skip-test != 'true'
+      shell: bash
+      run: uvx pytest -v
