@@ -20,11 +20,6 @@ inputs:
   s3-bucket:
     description: 'S3 Bucket name'
     required: true
-  additional-permissions:
-    description: 'Additional permissions for Claude Code'
-    required: false
-    default: |
-      actions: read
   mcp-config:
     description: 'MCP servers configuration for Claude Code'
     required: false
@@ -58,12 +53,6 @@ runs:
           --model ${{ inputs.model }}
           --mcp-config '${{ inputs.mcp-config }}'
           --allowedTools Edit,Read,Write
-        settings: |
-          {
-            "permissions": {
-              ${{ inputs.additional-permissions }}
-            }
-          }
         path_to_claude_code_executable: ${{ inputs.path_to_claude_code_executable }}
 
     - name: Install and configure MinIO Client
