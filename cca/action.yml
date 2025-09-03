@@ -41,6 +41,10 @@ inputs:
     description: 'Claude model to use'
     required: false
     default: 'claude-opus-4-1-20250805'
+  path_to_claude_code_executable:
+    description: 'Path to the Claude Code executable (if not in PATH)'
+    required: false
+    default: '/home/runner/.local/bin/claude'
 
 runs:
   using: 'composite'
@@ -60,6 +64,7 @@ runs:
               ${{ inputs.additional-permissions }}
             }
           }
+        path_to_claude_code_executable: ${{ inputs.path_to_claude_code_executable }}
 
     - name: Install and configure MinIO Client
       shell: bash
