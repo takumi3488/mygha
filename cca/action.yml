@@ -52,7 +52,6 @@ runs:
         claude_args: |
           --model ${{ inputs.model }}
           --mcp-config '${{ inputs.mcp-config }}'
-          --allowedTools Edit,Read,Write
         path_to_claude_code_executable: ${{ inputs.path_to_claude_code_executable }}
 
     - name: Install and configure MinIO Client
