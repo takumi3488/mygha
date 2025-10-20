@@ -24,14 +24,7 @@ inputs:
     description: 'MCP servers configuration for Claude Code'
     required: false
     default: |
-      {
-        "mcpServers": {
-          "context7": {
-            "type": "sse",
-            "url": "https://mcp.context7.com/sse"
-          }
-        }
-      }
+      {}
   model:
     description: 'Claude model to use'
     required: false
