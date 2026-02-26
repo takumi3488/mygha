@@ -30,6 +30,9 @@ runs:
       shell: bash
       run: taplo fmt --check --option reorder_keys=true Cargo.toml
 
+    - name: Cache Rust dependencies
+      uses: Swatinem/rust-cache@v2
+
     - name: Run cargo check
       shell: bash
       run: cargo check --all-features
