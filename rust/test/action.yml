@@ -22,10 +22,6 @@ runs:
       shell: bash
       run: taplo lint Cargo.toml
 
-    - name: Validate Cargo.toml
-      shell: bash
-      run: taplo check Cargo.toml
-
     - name: Check Cargo.toml formatting
       shell: bash
       run: taplo fmt --check --option reorder_keys=true Cargo.toml
@@ -33,19 +29,19 @@ runs:
     - name: Cache Rust dependencies
       uses: Swatinem/rust-cache@v2
 
+    - name: Check formatting
+      shell: bash
+      run: cargo fmt -- --check
+
     - name: Run cargo check
       shell: bash
       run: cargo check --all-features
-      
+
     - name: Run tests
       if: inputs.skip-test != 'true'
       shell: bash
       run: cargo test --all-features
-      
+
     - name: Run clippy
       shell: bash
-      run: cargo clippy --all-features -- -D warnings
-      
-    - name: Check formatting
-      shell: bash
-      run: cargo fmt -- --check
+      run: cargo clippy --all-targets --all-features -- -D warnings
