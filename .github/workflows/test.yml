@@ -1,0 +1,14 @@
+name: CI
+
+on: push
+
+jobs:
+  test-actions:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        action: [go/test, python/test, rust/test, bun/test, dotnet/test, julia/test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test ${matrix.action}
+        uses: takumi3488/mygha/${matrix.action}@main
