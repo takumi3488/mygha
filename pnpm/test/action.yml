@@ -1,0 +1,33 @@
+name: Test
+description: Run tests for pnpm project
+
+inputs:
+  skip-test:
+    description: 'Skip test execution if set to true'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v6
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: package.json
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Run tests
+      if: inputs.skip-test != 'true'
+      shell: bash
+      run: pnpm test
+
+    - name: Run lint
+      shell: bash
+      run: pnpm run lint
