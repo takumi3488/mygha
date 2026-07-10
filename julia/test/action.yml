@@ -2,6 +2,10 @@ name: 'Test'
 description: 'Test Julia project'
 
 inputs:
+  julia-version:
+    description: 'Julia version to use'
+    required: false
+    default: '1'
   skip-test:
     description: 'Skip test execution if set to true'
     required: false
@@ -13,7 +17,7 @@ runs:
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
-        version: '{{.juliaVersion}}'
+        version: ${{ inputs.julia-version }}
     
     - name: Install dependencies
       shell: bash
