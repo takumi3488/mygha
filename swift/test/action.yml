@@ -1,0 +1,29 @@
+name: 'Test'
+description: 'Test Swift project with swift-format and SwiftPM'
+
+inputs:
+  skip-test:
+    description: 'Skip test execution if set to true'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Swift
+      uses: SwiftyLab/setup-swift@v1.14.0
+      with:
+        swift-version: '6'
+
+    - name: Run swift format lint
+      shell: bash
+      run: swift format lint --strict --recursive Sources Tests Package.swift
+
+    - name: Run swift build
+      shell: bash
+      run: swift build
+
+    - name: Run tests
+      if: inputs.skip-test != 'true'
+      shell: bash
+      run: swift test
